@@ -28,6 +28,7 @@ public class GumTuneClientConfig extends Config {
     // Categories
     private transient static final String MACRO = "Macros";
     private transient static final String WORLD = "World"; //todo better name
+    // what do you mean? it's how it's supposed to be
     private transient static final String RENDER = "Render";
     private transient static final String CONFIG = "Config";
     private transient static final String MINING = "Mining";
