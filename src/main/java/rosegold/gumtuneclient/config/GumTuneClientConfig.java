@@ -642,6 +642,23 @@ public class GumTuneClientConfig extends Config {
     )
     public static int mobMacroDelay = 5;
 
+    @Slider(
+            name = "Stuck timeout in Ticks",
+            category = MACRO,
+            subcategory = MOB_MACRO,
+            min = 1, max = 1000
+    )
+    public static int mobMacroStuck = 100;
+
+    @Slider(
+            name = "Rotation speed in miliseconds",
+            category = MACRO,
+            subcategory = MOB_MACRO,
+            description = "How long will it take to snap to designated position in miliseconds",
+            min = 1, max = 500
+    )
+    public static int mobMacroRotationSpeed = 200;
+
     @Switch(
             name = "Walk",
             category = MACRO,
@@ -655,6 +672,14 @@ public class GumTuneClientConfig extends Config {
             subcategory = MOB_MACRO
     )
     public static boolean mobMacroJump = false;
+
+    @Switch(
+            name = "Auto stop",
+            category = MACRO,
+            subcategory = MOB_MACRO,
+            description = "Automatically stop when damaging the target"
+    )
+    public static boolean mobMacroStopOnHit = false;
 
     @Switch(
             name = "Smart Sprint",

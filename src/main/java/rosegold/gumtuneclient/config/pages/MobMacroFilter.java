@@ -37,4 +37,19 @@ public class MobMacroFilter {
             name = "Creepers"
     )
     public static boolean creepers = false;
+
+    @Switch(
+            name = "SilverFish"
+    )
+    public static boolean silverfish = false;
+
+    @Switch(
+            name = "Endermite"
+    )
+    public static boolean endermite = false;
+
+    @Switch(
+            name = "Skeletons"
+    )
+    public static boolean skeletons = false;
 }

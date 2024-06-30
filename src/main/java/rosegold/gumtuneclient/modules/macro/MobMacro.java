@@ -80,9 +80,9 @@ public class MobMacro {
                         break;
                     case 2:
                         if (lookAt.posY > mc.thePlayer.posY) {
-                            RotationUtils.smoothLook(RotationUtils.getRotation(lookAt, new Vec3(0, 0.1, 0)), 200);
+                            RotationUtils.smoothLook(RotationUtils.getRotation(lookAt, new Vec3(0, 0.1, 0)), GumTuneClientConfig.mobMacroRotationSpeed);
                         } else {
-                            RotationUtils.smoothLook(RotationUtils.getRotation(lookAt, new Vec3(0, mc.thePlayer.getEyeHeight(), 0)), 200);
+                            RotationUtils.smoothLook(RotationUtils.getRotation(lookAt, new Vec3(0, lookAt.getEyeHeight(), 0)), GumTuneClientConfig.mobMacroRotationSpeed);
                         }
                         break;
                 }
@@ -132,9 +132,11 @@ public class MobMacro {
 
         if (ticks < GumTuneClientConfig.mobMacroDelay) return;
         ticks = 0;
+        KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), false);
 
-        if (GumTuneClientConfig.mobMacroJump)
+        if (GumTuneClientConfig.mobMacroJump && mc.thePlayer.isCollidedHorizontally)
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), true);
+
         if (GumTuneClientConfig.mobMacroWalk) {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), lookAt != null);
             if (GumTuneClientConfig.mobMacroSmartSprint && lookAt != null) {
@@ -142,7 +144,7 @@ public class MobMacro {
             }
         }
 
-        if (stuckTicks > 100 && lookAt != null) {
+        if (stuckTicks > GumTuneClientConfig.mobMacroStuck && lookAt != null) {
             ignoreEntities.put(lookAt);
             return;
         }
@@ -160,8 +162,9 @@ public class MobMacro {
                 case 2:
                     if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && mc.objectMouseOver.entityHit.equals(lookAt)) {
                         PlayerUtils.leftClick();
-                        ignoreEntities.put(lookAt);
-                    } else if (mc.thePlayer.getDistanceToEntity(lookAt) < 1.5) {
+                        if(GumTuneClientConfig.mobMacroStopOnHit)
+                            KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);
+                    } else if (mc.thePlayer.getDistanceToEntity(lookAt) < 1) {
                         ignoreEntities.put(lookAt);
                     }
                     break;
@@ -205,7 +208,10 @@ public class MobMacro {
                 (entity instanceof EntityEnderman && MobMacroFilter.endermen) ||
                 (entity instanceof EntitySlime && MobMacroFilter.slime) ||
                 (entity instanceof EntityMagmaCube && MobMacroFilter.magmaCubes) ||
-                (entity instanceof EntityCreeper && MobMacroFilter.creepers);
+                (entity instanceof EntityCreeper && MobMacroFilter.creepers) ||
+                (entity instanceof EntitySilverfish && MobMacroFilter.silverfish) ||
+                (entity instanceof EntityEndermite && MobMacroFilter.endermite) ||
+                (entity instanceof EntitySkeleton && MobMacroFilter.skeletons);
     }
 
     private boolean releaseLock(Entity entity) {
