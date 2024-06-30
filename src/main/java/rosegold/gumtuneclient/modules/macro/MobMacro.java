@@ -82,7 +82,7 @@ public class MobMacro {
                         if (lookAt.posY > mc.thePlayer.posY) {
                             RotationUtils.smoothLook(RotationUtils.getRotation(lookAt, new Vec3(0, 0.1, 0)), GumTuneClientConfig.mobMacroRotationSpeed);
                         } else {
-                            RotationUtils.smoothLook(RotationUtils.getRotation(lookAt, new Vec3(0, lookAt.getEyeHeight(), 0)), GumTuneClientConfig.mobMacroRotationSpeed);
+                            RotationUtils.smoothLook(RotationUtils.getRotation(lookAt, new Vec3(0, 0 + lookAt.getEyeHeight(), 0)), GumTuneClientConfig.mobMacroRotationSpeed);
                         }
                         break;
                 }
