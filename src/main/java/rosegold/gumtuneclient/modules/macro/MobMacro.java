@@ -2,6 +2,7 @@ package rosegold.gumtuneclient.modules.macro;
 
 import cc.polyfrost.oneconfig.events.event.WorldLoadEvent;
 import cc.polyfrost.oneconfig.libs.eventbus.Subscribe;
+import cc.polyfrost.oneconfig.utils.Multithreading;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
@@ -174,8 +175,10 @@ public class MobMacro {
             activeEye = true;
         }else{
             if(!PathFinder.hasPath() && !PathFinder.calculating && getEntity(false) != null) {
-                PathFinder.setup(mc.thePlayer.getPosition(), getEntity(false).getPosition(), 0, 20);
-                ModUtils.sendMessage("Path found! Proceeding to goals...");
+                Multithreading.runAsync(() -> {
+                    PathFinder.setup(mc.thePlayer.getPosition(), getEntity(false).getPosition(), 0, 20);
+                    ModUtils.sendMessage("Path found! Proceeding to goals...");
+                });
             }
             if(PathFinder.hasPath()) {
                 if (PathFinder.getCurrent().addVector(0.5, 0, 0.5).distanceTo(mc.thePlayer.getPositionVector()) < 1 && PathFinder.hasNext()) {
