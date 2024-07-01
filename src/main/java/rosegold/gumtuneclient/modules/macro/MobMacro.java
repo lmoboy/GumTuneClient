@@ -24,6 +24,7 @@ import rosegold.gumtuneclient.config.pages.MobMacroFilter;
 import rosegold.gumtuneclient.events.PlayerMoveEvent;
 import rosegold.gumtuneclient.utils.*;
 import rosegold.gumtuneclient.utils.objects.TimedSet;
+import rosegold.gumtuneclient.utils.pathfinding.PathFinder;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class MobMacro {
 
     @SubscribeEvent
     public void onKey(InputEvent.KeyInputEvent event) {
-        if (Keyboard.getEventKeyState() || !LocationUtils.onSkyblock || !GumTuneClientConfig.mobMacro) return;
+        if (Keyboard.getEventKeyState() || !LocationUtils.onSkyblock ||  !GumTuneClientConfig.mobMacro) return;
         int eventKey = Keyboard.getEventKey();
         ArrayList<Integer> keyBinds = GumTuneClientConfig.mobMacroKeyBind.getKeyBinds();
         if (keyBinds.size() > 0 && keyBinds.get(0) == eventKey) {
@@ -70,9 +71,13 @@ public class MobMacro {
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent event) {
-        if (!isEnabled()) return;
+        if (!isEnabled()) {
+            PathFinder.reset();
+            return;
+        };
         if (lookAt != null) {
-            RenderUtils.renderBoundingBox(lookAt, event.partialTicks, Color.RED.getRGB());
+            PathFinder.reset();
+            RenderUtils.renderBoundingBox(lookAt, event.partialTicks, Color.GREEN.getRGB());
             if (mc.thePlayer.getDistanceToEntity(lookAt) > 1) {
                 switch (GumTuneClientConfig.mobMacroRotation) {
                     case 0:
@@ -82,16 +87,21 @@ public class MobMacro {
                         if (lookAt.posY > mc.thePlayer.posY) {
                             RotationUtils.smoothLook(RotationUtils.getRotation(lookAt, new Vec3(0, 0.1, 0)), GumTuneClientConfig.mobMacroRotationSpeed);
                         } else {
-                            RotationUtils.smoothLook(RotationUtils.getRotation(lookAt, new Vec3(0, 0 + lookAt.getEyeHeight(), 0)), GumTuneClientConfig.mobMacroRotationSpeed);
+                            RotationUtils.smoothLook(RotationUtils.getRotation(lookAt, new Vec3(0, 0 + lookAt.getEyeHeight()/2, 0)), GumTuneClientConfig.mobMacroRotationSpeed);
                         }
                         break;
                 }
             }
         }
 
+
+
+
+
+
         for (Entity entity : ignoreEntities) {
             if (entity != null) {
-                RenderUtils.renderBoundingBox(entity, event.partialTicks, Color.BLUE.getRGB());
+                RenderUtils.renderBoundingBox(entity, event.partialTicks, Color.RED.getRGB());
             }
         }
     }
@@ -109,19 +119,9 @@ public class MobMacro {
             return;
         }
 
-        if (GumTuneClientConfig.mobMacroAttackType == 0) {
-            if (sneak) {
-                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), false);
-                sneak = false;
-            } else if (activeEye && RotationUtils.done) {
-                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), true);
-                sneak = true;
-                activeEye = false;
-            }
-        }
 
         if (!GumTuneClientConfig.mobMacroEntityLock || releaseLock(lookAt)) {
-            lookAt = getEntity();
+            lookAt = getEntity(true);
         }
 
         if (previous == lookAt) {
@@ -172,6 +172,30 @@ public class MobMacro {
 
             sneak = true;
             activeEye = true;
+        }else{
+            if(!PathFinder.hasPath() && !PathFinder.calculating && getEntity(false) != null) {
+                PathFinder.setup(mc.thePlayer.getPosition(), getEntity(false).getPosition(), 0, 20);
+                ModUtils.sendMessage("Path found! Proceeding to goals...");
+            }
+            if(PathFinder.hasPath()) {
+                if (PathFinder.getCurrent().addVector(0.5, 0, 0.5).distanceTo(mc.thePlayer.getPositionVector()) < 1 && PathFinder.hasNext()) {
+                    PathFinder.goNext();
+                }
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), true);
+                RotationUtils.smoothLook(RotationUtils.getRotation(PathFinder.getCurrent().addVector(0.5, 0+mc.thePlayer.getEyeHeight(), 0.5)), GumTuneClientConfig.mobMacroRotationSpeed);
+                if(!PathFinder.hasNext())
+                    PathFinder.reset();
+            }
+            if (GumTuneClientConfig.mobMacroAttackType == 0) {
+                if (sneak) {
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), false);
+                    sneak = false;
+                } else if (activeEye && RotationUtils.done) {
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), true);
+                    sneak = true;
+                    activeEye = false;
+                }
+            }
         }
     }
 
@@ -179,7 +203,7 @@ public class MobMacro {
         return GumTuneClientConfig.mobMacro && LocationUtils.onSkyblock && mc.theWorld != null && mc.thePlayer != null && enabled;
     }
 
-    private Entity getEntity() {
+    private Entity getEntity(boolean visible) {
         Optional<Entity> optional = mc.theWorld.loadedEntityList.stream()
                 .filter(entity -> {
                     if (LocationUtils.currentIsland == LocationUtils.Island.DWARVEN_MINES && MobMacroFilter.creepers) {
@@ -190,12 +214,16 @@ public class MobMacro {
                 .filter(entity -> !entity.isDead && !ignoreEntities.contains(entity) && canKill(entity))
                 .filter(entity -> ((EntityLivingBase) entity).getHealth() > 0)
                 .filter(entity -> {
-                    if (GumTuneClientConfig.mobMacroAttackType == 2 && Math.abs(entity.posY - mc.thePlayer.posY) > 3) {
+                    if (GumTuneClientConfig.mobMacroAttackType == 2 && Math.abs(entity.posY - mc.thePlayer.posY) > 7) {
                         return false;
                     }
-                    RotationUtils.Rotation rotation = RotationUtils.getRotation(entity);
-                    MovingObjectPosition ray = RaytracingUtils.raytrace(rotation.yaw, rotation.pitch, 120);
-                    return ray != null && ray.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && ray.entityHit == entity;
+                    if(visible){
+
+                        RotationUtils.Rotation rotation = RotationUtils.getRotation(entity);
+                        MovingObjectPosition ray = RaytracingUtils.raytrace(rotation.yaw, rotation.pitch, 120);
+                        return ray != null && ray.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && ray.entityHit == entity;
+                    }
+                    return true;
                 }).min(Comparator.comparingDouble(entity -> entity.getDistanceToEntity(mc.thePlayer)));
 
         return optional.orElse(null);
