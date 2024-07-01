@@ -30,9 +30,11 @@ GumTuneClient is a brand-new quality of life modification for Hypixel SkyBlock, 
 
 ### This fork is meant for educational purposes only, i will be working on adding either useless or useful (rarely) features
 
-TODO list is 
-  - Mob macro
-  - - Update jump feature to jump only when there is an obstacle in front of the player (done)
-  - - Add goblins and other 'player' type mobs to the list
-  - Add tree macro
-  - - Pathfinding to closest chosen wood type
+Added:
+- Pathfinding for mob macro
+- The rest of mobs to the MobMacro filter
+
+ToDo:
+- Tune pathfinding for ground traversal
+- Tree macro (pathfinding and type of wood)
+- Failsafes (unusual game behaviour, players nearby)
