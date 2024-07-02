@@ -211,7 +211,7 @@ public class MobMacro {
                     }
                     return true;
                 })
-                .filter(entity -> !entity.isDead && !ignoreEntities.contains(entity)  && isLiving(entity) && isPlayer(entity) && canKill(entity))
+                .filter(entity -> !entity.isDead && !ignoreEntities.contains(entity)  && canKill(entity))
                 .filter(entity -> ((EntityLivingBase) entity).getHealth() > 0)
                 .filter(entity -> {
                     if (GumTuneClientConfig.mobMacroAttackType == 2 && Math.abs(entity.posY - mc.thePlayer.posY) > 7) {
@@ -228,13 +228,7 @@ public class MobMacro {
         return optional.orElse(null);
     }
 
-    private boolean isLiving(Entity entity) {
-        return entity instanceof EntityLivingBase;
-    }
 
-    private boolean isPlayer(Entity entity) {
-        return entity instanceof EntityOtherPlayerMP || entity instanceof EntityPlayerMP;
-    }
 
     private boolean canKill(Entity entity) {
         return
