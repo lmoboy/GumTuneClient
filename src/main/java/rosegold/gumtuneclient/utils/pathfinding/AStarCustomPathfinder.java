@@ -77,7 +77,7 @@ public class AStarCustomPathfinder {
                 }
             }
         }
-        ModUtils.sendMessage("Done calculating path, searched " + PathFinding.renderHubs.size() + " blocks, took: " + counter + "ms with an average of " + Math.round((double) counter / PathFinding.renderHubs.size() * 100) / 100 + "ms per block");
+//        ModUtils.sendMessage("Done calculating path, searched " + PathFinding.renderHubs.size() + " blocks, took: " + counter + "ms with an average of " + Math.round((double) counter / PathFinding.renderHubs.size() * 100) / 100 + "ms per block");
         hubs.sort(new CompareHub());
         path = hubs.get(0).getPath();
     }

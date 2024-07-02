@@ -49,6 +49,7 @@ public class GumTuneClientConfig extends Config {
     private transient static final String POWDER_CHEST_SOLVER = "Powder Chest Solver";
     private transient static final String NUKER = "Nuker";
     private transient static final String TRACKERS = "Trackers";
+//    private transient static final String TREE_MACRO = "Tree Macro";
     private transient static final String MOB_MACRO = "Mob Macro";
     private transient static final String SERVER_SIDE_ROTATIONS = "Server Side Rotations";
     private transient static final String CAMERA = "Camera";
@@ -75,6 +76,37 @@ public class GumTuneClientConfig extends Config {
     private transient static final String CUSTOM_BLOCK_ESP = "Custom Block ESP";
     private transient static final String OLD_MINECRAFT_LOGO = "Old Minecraft Logo";
     private transient static final String GEMSTONE_SACK_COMPACTOR = "Gemstone Sack Compactor";
+
+//    This one is for later when i will get my hands on making the wood macro
+//
+//
+//    @Switch(
+//            name = "Enabled",
+//            category = MACRO,
+//            subcategory = TREE_MACRO,
+//            size = 2
+//    )
+//    public static boolean treeMacro = false;
+//
+//
+//    @Dropdown(
+//            name = "Wood type",
+//            category = MACRO,
+//            subcategory = TREE_MACRO,
+//            options = {"Oak", "Spruce", "Birch", "Jungle", "Acacia", "Dark Oak"}
+//    )
+//    public static int treeMacroWoodType = 0;
+//
+//    @KeyBind(
+//            name = "Toggle Keybind",
+//            category = MACRO,
+//            subcategory = TREE_MACRO,
+//            size = 2
+//    )
+//    public static OneKeyBind treeMacroKeyBind = new OneKeyBind(UKeyboard.KEY_NONE);
+
+
+
 
     @Switch(
             name = "Enabled",
@@ -666,6 +698,13 @@ public class GumTuneClientConfig extends Config {
             subcategory = MOB_MACRO
     )
     public static boolean mobMacroWalk = false;
+
+    @Switch(
+            name = "Smart walk",
+            category = MACRO,
+            subcategory = MOB_MACRO
+    )
+    public static boolean mobMacroSmartWalk = false;
 
     @Switch(
             name = "Jump",
