@@ -33,6 +33,7 @@ GumTuneClient is a brand-new quality of life modification for Hypixel SkyBlock, 
 Added:
 - Pathfinding for mob macro
 - The rest of mobs to the MobMacro filter
+- NPC's in the MobMacro filter
 
 ToDo:
 - Tune pathfinding for ground traversal
